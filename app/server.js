@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const authRouter = require('./routes/authRoute');
+const trackRouter = require('./routes/trackRoute');
 
 
 
@@ -17,6 +18,7 @@ app.use(cors());
 
 // use middleware for authRequests
 app.use('/account', authRouter);
+app.use('/track', trackRouter);
 
 const port = 5000;
 app.listen(port, () => {

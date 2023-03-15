@@ -92,4 +92,6 @@ trackSchema.pre('save', (next) => {
   next();
 });
 
-module.exports = mongoose.model('Track', trackSchema);
+const Track = mongoose.model('Track', trackSchema);
+module.export = Track;
+

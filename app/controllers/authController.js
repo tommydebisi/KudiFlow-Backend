@@ -4,30 +4,9 @@ const { Types } = require('mongoose');
 const { randomBytes } = require('crypto');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
-const { createUserSchema, loginUserSchema } = require('../validators/Validate');
-
-/**
- * encrypts password
- * @param {string} password
- * @returns encrypted password
- */
-async function _hashPassword(password) {
-  // auto generate a salt and hash
-  return hash(password, 10);
-}
 const { User } = require('../models/User');
 const { hashPassword, generateAccessToken, sendEmail } = require('../utils/helper');
 
-/**
- * generates new access token
- * @param {object} obj - field to pass in token
- * @returns {string} accessToken
- */
-function generateAccessToken(obj) {
-  return jwt.sign(obj, process.env.API_SECRET, {
-    expiresIn: '15m'
-  });
-}
 
 class AuthController {
   static async signUp(req, res) {
@@ -37,36 +16,25 @@ class AuthController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
+    // validate password meets criteria
+
+    // Check if user already exists
+    const existingUser = await dbClient.getSchemaOne(User, { email });
+    if (existingUser) return res.status(400).json({ error: 'User already exists' });
+
+    const hashed_password = await hashPassword(password);
     try {
-      // Validate password meets criteria
-      await createUserSchema.validateAsync({ email, password });
+      // Create new user
+      const user = await User.create({ username, email, hashed_password });
 
-      // Check if user already exists
-      const existingUser = await dbClient.getSchemaOne(User, { email });
-      if (existingUser) return res.status(400).json({ error: 'User already exists' });
-
-      const hashed_password = await hashPassword(password);
-      try {
-        // Create new user
-        const user = await User.create({ username, email, hashed_password });
-
-        return res.status(201).json({ message: 'User created successfully' });
-      } catch (error) {
-        // Handle validation errors
-        return res.status(400).json({ error: error.message });
-      }
-
+      return res.status(201).json({ message: 'User created successfully' });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
     }
-  
+  };
 
   static async signIn(req, res) {
     const { email, password } = req.body;
-
-    // validate email using Joi schema
-    const { error } = await loginUserSchema.validateAsync({ email });
-    if (error) {
-      return res.status(400).json({ error: 'Invalid email format' });
-    }
 
     // check if email and password is present
     if (!email) return res.status(400).json({ error: 'Missing email' });
@@ -75,12 +43,10 @@ class AuthController {
 
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
-
     const user = await dbClient.getSchemaOne(User, { email });
     if (!user || !(await compare(password, user.hashed_password))) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
-
 
     //signing token with user id
     const accessToken = generateAccessToken({ email });
@@ -156,6 +122,4 @@ class AuthController {
   }
 }
 
-
-//Reset password
 module.exports = AuthController;

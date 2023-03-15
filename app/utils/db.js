@@ -6,9 +6,9 @@ class DBClient {
     this._db = process.env.DB_NAME;
 
     mongoose.connect(
-     `mongodb+srv://${this._username}:${this._password}@cluster0.ijtgnu3.mongodb.net/${this._db}`
+      `mongodb+srv://${this._username}:${this._password}@cluster0.ijtgnu3.mongodb.net/${this._db}`
 
-    //'mongodb://127.0.0.1:27017/product'
+      //'mongodb://127.0.0.1:27017/product'
     
 
      
@@ -24,7 +24,49 @@ class DBClient {
   async getSchemaOne(schema, obj) {
     return schema.findOne(obj);
   }
-}
 
+  /**
+   * gets one row in the db that match the object passed
+   * @param {mongoose.Schema} schema - db schema to query
+   * @param {object} obj - obj to search for in db
+   * @returns object in db if present else null
+   */
+  async trackSchemaOne(schema, obj) {
+  
+    return schema.findOneAndUpdate(obj, {
+      $push: {
+        income: {
+          amount,
+          description
+        }
+      },
+      $inc: {
+        totalIncome: amount,
+        currentBalance: amount
+      }
+    }, { upsert: true, new: true });
+  }
+
+    /**
+   * gets one row in the db that match the object passed
+   * @param {mongoose.Schema} schema - db schema to query
+   * @param {object} obj - obj to search for in db
+   * @returns object in db if present else null
+   */
+  async trackExpenses(schema, obj) {
+    return schema.findOneAndUpdate(obj, {
+      $push: {
+        expense: {
+          amount,
+          description
+        }
+      },
+      $inc: {
+        totalExpenses: amount,
+        currentBalance: -amount
+      }
+    }, { upsert: true, new: true })
+  }
+}
 const dbClient = new DBClient();
 module.exports = dbClient;
