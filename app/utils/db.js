@@ -9,9 +9,9 @@ class DBClient {
       `mongodb+srv://${this._username}:${this._password}@cluster0.ijtgnu3.mongodb.net/${this._db}`
 
       //'mongodb://127.0.0.1:27017/product'
-    
 
-     
+
+
     ).then(() => console.log('db connected'));
   }
 
@@ -32,7 +32,7 @@ class DBClient {
    * @returns object in db if present else null
    */
   async trackSchemaOne(schema, obj) {
-  
+
     return schema.findOneAndUpdate(obj, {
       $push: {
         income: {

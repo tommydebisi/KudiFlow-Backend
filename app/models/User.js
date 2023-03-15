@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const Track = require('./Track');
 const bcrypt = require('bcrypt')
 
 const imageSchema = new mongoose.Schema({
@@ -52,10 +51,6 @@ const userSchema = new mongoose.Schema({
   profileImage: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Image'
-  },
-  trackId: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'Track'
   }
 },
 {

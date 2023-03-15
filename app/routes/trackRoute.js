@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const TrackController = require('../controllers/trackController');
+const authToken = require('../middlewares/authToken');
 
 
-router.route('/income').post(TrackController.income);
-
-router.route('/expenses').post(TrackController.expenses);
-
-router.route('/currentBalance').get(TrackController.currentBalance);
-
+router.route('/income').post(authToken, TrackController.income);
+router.route('/expenses').post(authToken, TrackController.expenses);
+router.route('/currentBalance').get(authToken, TrackController.currentBalance);
 
 module.exports = router;

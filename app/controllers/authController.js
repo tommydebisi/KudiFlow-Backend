@@ -5,6 +5,7 @@ const { randomBytes } = require('crypto');
 const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
 const { User } = require('../models/User');
+const Track = require('../models/Track');
 const { hashPassword, generateAccessToken, sendEmail } = require('../utils/helper');
 
 
@@ -26,6 +27,8 @@ class AuthController {
     try {
       // Create new user
       const user = await User.create({ username, email, hashed_password });
+      // create new track for user
+      const track = await Track.create({ userId: user._id });
 
       return res.status(201).json({ message: 'User created successfully' });
     } catch (error) {
@@ -49,8 +52,8 @@ class AuthController {
     }
 
     //signing token with user id
-    const accessToken = generateAccessToken({ email });
-    const refreshToken = jwt.sign({ email }, process.env.API_SECRET_REFRESH);
+    const accessToken = generateAccessToken({ id: user._id.toString() });
+    const refreshToken = jwt.sign({ id: user._id.toString() }, process.env.API_SECRET_REFRESH);
 
     // save refresh token in redis
     const result = await redisClient.set(`auth_${accessToken}`, refreshToken);
@@ -61,7 +64,7 @@ class AuthController {
   }
 
   static async getNewToken(req, res) {
-    // get expired accesstoken from request body
+    // get expired access token from request body
     const { token } = req.body
 
     if (!token) return res.status(400).json({ error: 'Missing Token' });
@@ -74,16 +77,16 @@ class AuthController {
     jwt.verify(refreshToken, process.env.API_SECRET_REFRESH, async (err, field) => {
       if (err) return res.status(403).json({ error: 'Unable to verify token' })
 
-      const accessToken = generateAccessToken({ email: field.email })
+      const accessToken = generateAccessToken({ id: field.id })
       // remove previous accessToken
       await redisClient.del(`auth_${token}`);
-      await redisClient.set(accessToken, refreshToken);
+      await redisClient.set(`auth_ ${accessToken}`, refreshToken);
       return res.status(200).json({ accessToken });
     });
 
   }
   static async logout(req, res) {
-    await redisClient.del(`auth_${req.user}`);
+    await redisClient.del(`auth_${req.token}`);
     return res.status(204).send('\n');
   }
 
@@ -97,8 +100,8 @@ class AuthController {
     const resetToken = require('crypto').randomBytes(30).toString('hex');
 
     try {
-      // store reset password with expiry for 2min
-      await redisClient.setex(`reset_${resetToken}`, user._id.toString(), 300);
+      // store reset password with expiry for 4min
+      await redisClient.setex(`reset_${resetToken}`, user._id.toString(), 240);
     } catch (e) {
       return res.status(400).json({ error: e.message });
     }
