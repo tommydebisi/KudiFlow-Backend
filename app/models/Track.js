@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
-
+const { User } = require('./User');
 
 const trackSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
+  },
   currentBalance: {
     type: Number,
     default: 0
@@ -92,4 +96,5 @@ trackSchema.pre('save', (next) => {
   next();
 });
 
-module.exports = mongoose.model('Track', trackSchema);
+const Track = mongoose.model('Track', trackSchema);
+module.exports = Track;

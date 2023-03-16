@@ -12,7 +12,7 @@ function authToken(req, res, next) {
     if (err) return res.status(401).json({ error: 'Unauthorized' });
 
     // set request var and move to next middleware
-    req.email = field.email;
+    req.userId = field.id;
     req.token = token;
     next();
   });
