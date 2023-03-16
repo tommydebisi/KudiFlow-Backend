@@ -5,7 +5,7 @@ const authToken = require('../middlewares/authToken');
 
 
 router.route('/income').post(authToken, TrackController.income);
-router.route('/expenses').post(authToken, TrackController.expenses);
-router.route('/currentBalance').get(authToken, TrackController.currentBalance);
+router.route('/expenses').post(authToken, TrackController.expense);
+
 
 module.exports = router;

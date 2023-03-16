@@ -46,11 +46,11 @@ class AuthController {
     if (!email) return res.status(400).json({ error: 'Missing email' });
 
    // validate email using Joi schema
-    const { error } = await loginUserSchema.validateAsync({ email });
+    /**const { error } = await loginUserSchema.validateAsync({ email });
     if (error) {
       return res.status(400).json({ error: 'Invalid email format' });
     }
-
+**/
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
     const user = await dbClient.getSchemaOne(User, { email });
