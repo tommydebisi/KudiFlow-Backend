@@ -7,6 +7,8 @@ const redisClient = require('../utils/redis');
 const { User } = require('../models/User');
 const Track = require('../models/Track');
 const { hashPassword, generateAccessToken, sendEmail } = require('../utils/helper');
+const { createUserSchema, loginUserSchema } = require('../validators/Validate');
+
 
 
 class AuthController {
@@ -18,6 +20,7 @@ class AuthController {
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
     // validate password meets criteria
+    await createUserSchema.validateAsync({ email, password });
 
     // Check if user already exists
     const existingUser = await dbClient.getSchemaOne(User, { email });
@@ -42,15 +45,18 @@ class AuthController {
     // check if email and password is present
     if (!email) return res.status(400).json({ error: 'Missing email' });
 
-    // do the validation for email here
-
+   // validate email using Joi schema
+    /**const { error } = await loginUserSchema.validateAsync({ email });
+    if (error) {
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+**/
     if (!password) return res.status(400).json({ error: 'Missing password' });
 
     const user = await dbClient.getSchemaOne(User, { email });
     if (!user || !(await compare(password, user.hashed_password))) {
       return res.status(400).json({ error: 'Invalid email or password' });
     }
-
     //signing token with user id
     const accessToken = generateAccessToken({ id: user._id.toString() });
     const refreshToken = jwt.sign({ id: user._id.toString() }, process.env.API_SECRET_REFRESH);
