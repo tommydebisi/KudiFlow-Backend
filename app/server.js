@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const authRouter = require('./routes/authRoute');
 const trackRouter = require('./routes/trackRoute');
+const startConnection = require('./utils/connector');
 
 
 
@@ -20,7 +21,4 @@ app.use(cors());
 app.use('/account', authRouter);
 app.use('/track', trackRouter);
 
-const port = 5000;
-app.listen(port, () => {
-  console.log(`Listening on port ${port}`);
-});
+startConnection(app, 5000);

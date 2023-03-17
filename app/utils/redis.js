@@ -18,8 +18,6 @@ class RedisClient {
     this.client.on('error', (err) => {
       console.log(`Error: ${err}`);
     });
-
-    this.client.connect();
   }
 
   /**
