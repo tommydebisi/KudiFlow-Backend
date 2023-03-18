@@ -1,4 +1,4 @@
-const dbClient = require('../utils/db');
+/**const dbClient = require('../utils/db');
 const redisClient = require('../utils/redis');
 const { User } = require('../models/User');
 const Track = require('../models/Track');
@@ -25,3 +25,4 @@ async function start() {
     console.log(e.message);
   }
 }
+**/
