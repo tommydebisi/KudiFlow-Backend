@@ -1,11 +1,12 @@
 {
-  "name": "backend",
+  "name": "Kudiflow-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "app.js",
+  "description": "KudiFlow is a web app, that solves the issue of keeping track of expenses and income",
+  "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "test": "jest"
+    "dev": "nodemon server",
+    "test": "jest",
+    "start": "node ./app/server.js"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,8 @@
     "jsonwebtoken": "^9.0.0",
     "mongoose": "^7.0.0",
     "nodemailer": "^6.9.1",
-    "redis": "^4.6.5"
+    "redis": "^4.6.5",
+    "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {
     "jest": "^29.5.0",
