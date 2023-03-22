@@ -22,3 +22,4 @@ app.use('/account', authRouter);
 app.use('/track', trackRouter);
 
 startConnection(app, 5000);
+module.exports = app;
