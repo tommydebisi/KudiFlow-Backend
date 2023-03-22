@@ -20,3 +20,4 @@ app.use(cors());
 app.use('/v1', routes);
 
 startConnection(app, 5000);
+module.exports = app;
