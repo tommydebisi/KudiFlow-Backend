@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const TrackController = require('../controllers/trackController');
-const authToken = require('../middlewares/authToken');
+const TrackController = require('../../controllers/trackController');
+const authToken = require('../../middlewares/authToken');
 
 router.route('/income').post(authToken, TrackController.addIncome);
 router.route('/expense').post(authToken, TrackController.addExpense);

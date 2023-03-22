@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const { User } = require('./User');
 
+/**
+ * @typedef Track
+ */
 const trackSchema = new mongoose.Schema({
   userId: {
     type: mongoose.SchemaTypes.ObjectId,
@@ -96,5 +99,8 @@ trackSchema.pre('save', (next) => {
   next();
 });
 
+/**
+ * @typedef Track
+ */
 const Track = mongoose.model('Track', trackSchema);
 module.exports = Track;
