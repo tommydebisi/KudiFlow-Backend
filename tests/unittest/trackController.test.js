@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
-const TrackController = require('../../controllers/trackController');
-const Track = require('../../models/Track');
+const TrackController = require('../../app/controllers/trackController');
+const Track = require('../../app/models/Track');
 
 describe('TrackController', () => {
   describe('addIncome', () => {
@@ -25,7 +25,7 @@ describe('TrackController', () => {
       const req = { body: { amount: 100, description: 'Test income' }, userId: 'user-id' };
       const saveStub = sinon.stub().returnsThis();
       const track = { currentBalance: 0, income: [], totalIncome: 0, totalExpenses: 0, save: saveStub };
-      const getSchemaOneStub = sinon.stub().resolves(track);
+      // const getSchemaOneStub = sinon.stub().resolves(track);
       sinon.stub(Track, 'currentBalance').get(() => 0);
       sinon.stub(dbClient, 'getSchemaOne').resolves(track);
       const res = { status: sinon.stub().returnsThis(), json: sinon.stub() };

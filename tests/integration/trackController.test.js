@@ -1,12 +1,16 @@
 const request = require('supertest');
-const app = require('../server'); 
-const dbClient = require('../utils/db');
-const Track = require('../models/Track');
 const { Types } = require('mongoose');
+const app = require('../../app/server');
+const dbClient = require('../../app/utils/db');
+const Track = require('../../app/models/Track');
 
 
 
   describe('POST /income', () => {
+    // before(() => {
+
+    // });
+
     it('should add a new income record', async () => {
       // create a new user
       const user = await dbClient.getSchemaOne(Track, {
