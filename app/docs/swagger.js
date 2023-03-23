@@ -8,8 +8,8 @@ const swaggerDef = {
     "description": "# KudiFlow API\n\n## Introduction\n\nKudiflow Api Documentation shows how to make use of the available API endpoints.\n\n## Overview\n\n_There are two subdivisons of the kudiflow api which are:_\n\n- User Auth - The entire authentication, and creation of a users in KudiFlow\n- Track Income and Exp - The entire backend logic of the track feature implemented in the **KudiFlow Application**",
     "contact": {}
   },
-  "host": "http://localhost:5000/v1",
-  "basePath": "/",
+  "host": "http://localhost:5000",
+  "basePath": "/v1",
   "securityDefinitions": {},
   "schemes": [
     "http"
