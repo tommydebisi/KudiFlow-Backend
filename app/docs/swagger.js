@@ -3,15 +3,12 @@ const { version } = require('../../package.json');
 const swaggerDef = {
   "swagger": "2.0",
   "info": {
-    version,
+    "version": `${version}`,
     "title": "KudiFlow",
-    "description": "<img src=\"https://content.pstmn.io/61406565-3b97-4ea5-b4f6-b245e5d3d7fb/RnJhbWUgNC5qcGc=\" alt=\"\" height=\"143\" width=\"100\">\n\n# KudiFlow API\n\nApi Documentation to make others understand the appropriate requests and responses need to consume the available endpoints\n\n## Overview\n\n_There are two subdivisons of the kudiflow api which are:_\n\n- User Auth - Which deals with the entire authentication, and creation of a user in KudiFlow\n- Track Income and Exp - Which deals with the entire backend logic of the track feature implemented in the **KudiFlow Application**",
-    "contact": {
-      name: 'KudiFlow',
-      email: process.env.MAIL_USER,
-    }
+    "description": "# KudiFlow API\n\n## Introduction\n\nKudiflow Api Documentation shows how to make use of the available API endpoints.\n\n## Overview\n\n_There are two subdivisons of the kudiflow api which are:_\n\n- User Auth - The entire authentication, and creation of a users in KudiFlow\n- Track Income and Exp - The entire backend logic of the track feature implemented in the **KudiFlow Application**",
+    "contact": {}
   },
-  "host": "http://localhost:5000/v1",
+  "host": "example.com",
   "basePath": "/",
   "securityDefinitions": {},
   "schemes": [
@@ -26,7 +23,7 @@ const swaggerDef = {
   "paths": {
     "/account/register": {
       "post": {
-        "description": "## Register Request\n\nThis request creates a **user** account, a returns a success message upon completion.\n\nIt takes in three required parameters which are:\n\n- username\n- email\n- password\n    \n\nThe email inputted should be unique unless an error would be gotten",
+        "description": "This endpoint creates a **user** account. This endpoint is to be called when a user wants to sign up.\n\nRequest Body parameters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| username | string | Name the user wants to be identified by |\n| email | string | Unique email provided by the user |\n| password | string | Password for the user to gain access to an account |",
         "summary": "Register User",
         "tags": [
           "User Auth"
@@ -151,7 +148,7 @@ const swaggerDef = {
     },
     "/account/logout": {
       "get": {
-        "description": "## Logout Request\n\nThis endpoint logs out the user currently in session and gives an empty response else returns an error message that the user is not authorized",
+        "description": "This endpoint logs out the user currently in session.",
         "summary": "Logout User",
         "tags": [
           "User Auth"
@@ -161,7 +158,15 @@ const swaggerDef = {
         "produces": [
           "application/json; charset=utf-8"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          }
+        ],
         "responses": {
           "204": {
             "description": "No Content",
@@ -229,13 +234,12 @@ const swaggerDef = {
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/account/token-reset": {
       "get": {
-        "description": "## Token Request\n\nThis endpoint takes in the access **token** given on sign in\n\nExpired or not and generates a new one, the accesstoken passed in must be a valid token recognised by the server\n\nIf not availale it returns an error of **Forbidden**",
+        "description": "This endpoint gives a new access token for a **user** on request.\n\n**Note**\n\n- User must be signed in to a get a new access token.\n    \n\nRequest Body Parameters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| token | string | The access token a user receives on logging in. |",
         "summary": "New token",
         "tags": [
           "User Auth"
@@ -335,7 +339,7 @@ const swaggerDef = {
     },
     "/forgot": {
       "get": {
-        "description": "## Forgot Password request\n\nThis request sends a mail to the user. Where the user is redirected to page to reset his/her `password`\n\nOnce the mail is sent successfully, a `success` message is gotten.\n\nIf the user can't be found an error message message is sent saying `NOT FOUND`",
+        "description": "This endpoint mails the user with instructions to reset password forgotten.\n\nRequest Body Parameters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| email | string | Email linked with an account. |",
         "summary": "Forgot password",
         "tags": [
           "User Auth"
@@ -394,7 +398,7 @@ const swaggerDef = {
     },
     "/account/login": {
       "get": {
-        "description": "## Login Request\n\nThis endpoint takes in a registered user's **email** and **password, then returns an accesstoken that the user can use to access other pages in the website**",
+        "description": "This endpoint logs a registered user in.\n\nRequest Body Paramters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| email | string | Email used to register. |\n| password | string | Password used to register |",
         "summary": "Login user",
         "tags": [
           "User Auth"
@@ -494,7 +498,7 @@ const swaggerDef = {
     },
     "/account/password-reset": {
       "post": {
-        "description": "## Password Reset request\n\nThis request is used to reset the `user` password. It takes in `newPassword`, confirmPassword and the `reset_token which are all string fields`",
+        "description": "This endpoint resets the user's password.\n\nRequest Body Parameter:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| newPassword | string | password to replace old one. |\n| confirmPassword | string | confirmation of the new password |\n| resetToken | string | token passed as a query parameter in the email sent to the user. |",
         "summary": "Reset password",
         "tags": [
           "User Auth"
@@ -563,7 +567,7 @@ const swaggerDef = {
     },
     "/track/trackIEs": {
       "get": {
-        "description": "## Income-Expense Request\n\nThis request gets the list of `income` and `expense` for the current user requesting as well as the updated current balance.\n\nThe income and expenses are paginated, a param `page` and/or `limit` can be set to get a particular page with a limit to documents recieved",
+        "description": "This endpoint gets the list of `income` and `expense` for the current user as well as the updated current balance.\n\nURL Query Paramters:\n\n| **Name** | **Data Type** | **Required?** | **Default** | **Description** |\n| --- | --- | --- | --- | --- |\n| page | integer | No | 0 | Current page for the list of Income and Expenses |\n| limit | integer | No | 5 | Maximum number of Income and expenses per page |",
         "summary": "User income and expense",
         "tags": [
           "Track Income and Exp"
@@ -574,6 +578,13 @@ const swaggerDef = {
           "application/json; charset=utf-8"
         ],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
           {
             "name": "page",
             "in": "query",
@@ -695,13 +706,12 @@ const swaggerDef = {
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/track/income": {
       "post": {
-        "description": "## Income add request\n\nThis request adds the users income and descriptoion to the database and returns a success message.\n\nIf `user` isn't logged in, `user` is unauthorized and will be redirected to home page",
+        "description": "This endpoint adds the user's income and description.\n\nRequest Body Parameters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| amount | integer | amount received |\n| description | string | details of the transaction |",
         "summary": "Add income",
         "tags": [
           "Track Income and Exp"
@@ -712,6 +722,13 @@ const swaggerDef = {
           "application/json; charset=utf-8"
         ],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
           {
             "name": "Body",
             "in": "body",
@@ -805,13 +822,12 @@ const swaggerDef = {
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/track/expense": {
       "post": {
-        "description": "## Expense only Request\n\nThis request adds the `user` expense and descriptoion to the database and returns a success message.\n\nIf `user` isn't logged in, `user` is unauthorized and will be redirected to home page",
+        "description": "This endpoint adds the user's expense and description.\n\nRequest Body Parameters:\n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| amount | integer | amount spent |\n| description | string | details of the transaction |",
         "summary": "Add expense",
         "tags": [
           "Track Income and Exp"
@@ -822,6 +838,13 @@ const swaggerDef = {
           "application/json; charset=utf-8"
         ],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
           {
             "name": "Body",
             "in": "body",
@@ -915,13 +938,12 @@ const swaggerDef = {
               }
             }
           }
-        },
-        "security": []
+        }
       }
     },
     "/track/balance": {
       "post": {
-        "description": "## Track Balance request\n\nThis request add the currentBalance gotten to be the starting balance in the users dashboard.\n\nIt takes in a filed `currentBalance` which is give an number to add to the database",
+        "description": "This endpoint adds the user's starting balance to track.\n\n**NOTE:**\n\n- Use when the user wants to start tracking.\n    \n\n| **Name** | **Data Type** | **Description** |\n| --- | --- | --- |\n| currentBalance | integer | amount to start tracking |",
         "summary": "Add user balance",
         "tags": [
           "Track Income and Exp"
@@ -932,6 +954,13 @@ const swaggerDef = {
           "application/json; charset=utf-8"
         ],
         "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": false,
+            "default": "Bearer {token}",
+            "type": "string"
+          },
           {
             "name": "Body",
             "in": "body",
@@ -1025,8 +1054,7 @@ const swaggerDef = {
               }
             }
           }
-        },
-        "security": []
+        }
       }
     }
   },
@@ -1485,11 +1513,11 @@ const swaggerDef = {
   "tags": [
     {
       "name": "User Auth",
-      "description": "**Contains the apis responsible for the authentication of the kudiflow application**"
+      "description": "**Authentication APIs for the kudiflow application.**"
     },
     {
       "name": "Track Income and Exp",
-      "description": "Contains all the api required for the logic of the `Track` feature page implemented in the `KudiFlow` application"
+      "description": "APIs for the`Track` feature implemented."
     }
   ]
 }
