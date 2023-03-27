@@ -19,7 +19,4 @@ async function startConnection(app, port) {
     });
   });
 }
-
-
-
 module.exports = startConnection;
