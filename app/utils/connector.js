@@ -6,6 +6,8 @@ const redisClient = require('./redis');
  * @param {*} app - express application to start
  * @param {number} port - port to listen on
  */
+
+
 async function startConnection(app, port) {
   await dbClient.mongo
     .then(async () => {
@@ -17,5 +19,7 @@ async function startConnection(app, port) {
     });
   });
 }
+
+
 
 module.exports = startConnection;

@@ -5,7 +5,8 @@ const app = express();
 const authRouter = require('./routes/authRoute');
 const trackRouter = require('./routes/trackRoute');
 const startConnection = require('./utils/connector');
-
+const dbClient = require('./utils/db');
+const redisClient = require('./utils/redis');
 
 
 // parse json in request body
@@ -22,4 +23,5 @@ app.use('/account', authRouter);
 app.use('/track', trackRouter);
 
 startConnection(app, 5000);
-module.exports = app;
+module.exports = app
+
