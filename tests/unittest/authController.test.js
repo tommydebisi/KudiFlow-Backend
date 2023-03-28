@@ -1,21 +1,18 @@
 const AuthController = require('../../app/controllers/authController');
-const app = require('../../app/server');
-
 const request = require('supertest');
 const jwt = require('jsonwebtoken');
 const dbClient = require('../../app/utils/db');
 const redisClient = require('../../app/utils/redis');
 const { User } = require('../../app/models/User');
 const Track = require('../../app/models/Track');
-const { Types } = require('mongoose');
+
 
 const { generateAccessToken, sendEmail, hashPassword } = require('../../app/utils/helper');
-
 
 describe('AuthController', () => {
     describe('signUp', () => {
         it('should return an error if username is missing', async () => {
-            const req = { body: { email: 'test@test.com', password: 'password@123' } };
+            const req = { body: { email: 'test@test.com', password: 'password@123', } };
             const res = {
                 status: jest.fn().mockReturnThis(),
                 json: jest.fn(),
@@ -65,7 +62,6 @@ describe('createUser function', () => {
       const username = 'testuser';
       const password = 'password@123';
   
-     
       const userMock = {
         _id: 'user_id'
       };
@@ -140,3 +136,64 @@ describe('createUser function', () => {
     });
   });
   
+describe('signIn function', () => {
+  it('returns 400 if email is missing', async () => {
+    const req = { body: { password: 'password' } };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  
+    await AuthController.signIn(req, res);
+  
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Missing email' });
+  });
+  
+  it('returns 400 if password is missing', async () => {
+    const req = { body: { email: 'test@example.com' } };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+  
+    await AuthController.signIn(req, res);
+  
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Missing password' });
+  });
+
+  it('returns 400 if email or password is invalid', async () => {
+    const req = { body: { email: 'test@example.com', password: 'password' } };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    dbClient.getSchemaOne = jest.fn().mockResolvedValue(null);
+
+    await AuthController.signIn(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({ error: 'Invalid email or password' });
+  });
+
+  it('returns access token if email and password are valid', async () => {
+    const req = { body: { email: 'test@example.com', password: 'password' } };
+    const res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    };
+
+    const user = { _id: Types.ObjectId().toString(), email: 'test@example.com', hashed_password: 'hashedPassword' };
+
+    dbClient.getSchemaOne = jest.fn().mockResolvedValue(user);
+    compare.mockResolvedValue(true);
+    generateAccessToken.mockReturnValue('accessToken');
+
+    await AuthController.signIn(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(202);
+    expect(res.json).toHaveBeenCalledWith({ accessToken: 'accessToken' });
+  });
+})
