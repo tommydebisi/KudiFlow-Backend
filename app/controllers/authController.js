@@ -33,7 +33,7 @@ class AuthController {
       // create new track for user
       const track = await Track.create({ userId: user._id });
 
-      return res.status(201).json({ message: 'User created successfully' });
+      return res.status(201).json({ message: 'success' });
     } catch (error) {
       return res.status(400).json({ error: error.message });
     }
@@ -93,7 +93,7 @@ class AuthController {
   }
   static async logout(req, res) {
     await redisClient.del(`auth_${req.token}`);
-    return res.status(204).send('\n');
+    return res.status(204).end();
   }
 
   static async forgot(req, res) {

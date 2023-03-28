@@ -1,12 +1,10 @@
 require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
-const app = express();
-const authRouter = require('./routes/authRoute');
-const trackRouter = require('./routes/trackRoute');
+const routes = require('./routes/v1');
 const startConnection = require('./utils/connector');
-const dbClient = require('./utils/db');
-const redisClient = require('./utils/redis');
+
+const app = express();
 
 
 // parse json in request body
@@ -18,10 +16,8 @@ app.use(express.urlencoded({extended: false}));
 // promotes cross origin resource sharing
 app.use(cors());
 
-// use middleware for authRequests
-app.use('/account', authRouter);
-app.use('/track', trackRouter);
+// use middleware for v1 api requests
+app.use('/v1', routes);
 
 startConnection(app, 5000);
-module.exports = app
-
+module.exports = app;
