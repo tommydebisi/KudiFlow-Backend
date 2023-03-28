@@ -7,6 +7,7 @@
     "dev": "nodemon ./app/server",
     "test": "jest",
     "start": "node ./app/server"
+
   },
   "keywords": [],
   "author": "",
