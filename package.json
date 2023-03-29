@@ -7,7 +7,6 @@
     "dev": "nodemon ./app/server",
     "test": "jest",
     "start": "node ./app/server"
-
   },
   "keywords": [],
   "author": "",
@@ -24,6 +23,7 @@
     "mongoose": "^7.0.0",
     "nodemailer": "^6.9.1",
     "redis": "^4.6.5",
+    "redis-mock": "^0.56.3",
     "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {
