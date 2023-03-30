@@ -261,5 +261,59 @@ describe('AuthController', () => {
     });
     
   })
-})
+
+  describe('AuthController', () => {
+    describe('logout', () => {
+      it('should delete the auth token from redis and return a 204 response', async () => {
+        // Mock req and res objects
+        const req = { token: 'testToken' };
+        const res = { status: jest.fn().mockReturnThis(), end: jest.fn() };
+  
+        // Mock the redisClient.del method
+        redisClient.del = jest.fn().mockResolvedValueOnce();
+  
+        // Call the logout function
+        await AuthController.logout(req, res);
+  
+        // Verify that redisClient.del was called with the correct argument
+        expect(redisClient.del).toHaveBeenCalledWith('auth_testToken');
+  
+        // Verify that res.status and res.end were called with the correct arguments
+        expect(res.status).toHaveBeenCalledWith(204);
+        expect(res.end).toHaveBeenCalled();
+      });
+    });
+  });
+  
+
+  jest.mock('../../app/utils/redis', () => ({
+    ...jest.requireActual('../../app/utils/redis'),
+    setex: jest.fn(),
+  }));
+
+  describe('forgot', () => {
+    it('should return an error if redisClient.setex fails', async () => {
+    
+      const req = { body: { email: 'test@test.com' } };
+      const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+      const user = { _id: '123', email: 'test@test.com' };
+      dbClient.getSchemaOne.mockResolvedValueOnce(user);
+      redisClient.setex.mockRejectedValueOnce(new Error('Failed to set redis key'));
+
+
+      await AuthController.forgot(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ error: 'Failed to set redis key' });
+    });
+
+  })
+  
+  });
+  
+
+
+
+
+
 
