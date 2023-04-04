@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
-const { hash } = require('bcrypt');
-const nodemailer = require('nodemailer');
+const jwt = require("jsonwebtoken");
+const { hash } = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 /**
  * encrypts password
@@ -19,7 +19,7 @@ async function hashPassword(password) {
  */
 function generateAccessToken(obj) {
   return jwt.sign(obj, process.env.API_SECRET, {
-    expiresIn: '15m'
+    expiresIn: "2m",
   });
 }
 
@@ -31,22 +31,22 @@ function generateAccessToken(obj) {
  */
 function sendEmail(token, emailTo) {
   const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    service: "gmail",
     auth: {
-      type: 'OAuth2',
+      type: "OAuth2",
       user: process.env.MAIL_USER,
       pass: process.env.MAIL_PASSWORD,
       clientId: process.env.MAIL_CLIENT_ID,
       clientSecret: process.env.MAIL_CLIENT_SECRET,
-      refreshToken: process.env.MAIL_REF_TOKEN
-    }
+      refreshToken: process.env.MAIL_REF_TOKEN,
+    },
   });
 
   const mailOptions = {
     from: `${process.env.MAIL_USER}`,
     to: `${emailTo}`,
-    subject: 'Password reset',
-    text: 'Find below your reset password',
+    subject: "Password reset",
+    text: "Find below your reset password",
     html: `
   <!DOCTYPE html>
   <html>
@@ -105,24 +105,22 @@ function sendEmail(token, emailTo) {
       <p>The KudiFlow Team</p>
     </div>
   </div>
-  </html>`
-  }
+  </html>`,
+  };
 
   // convert callback to promise
 
   transporter.sendMail(mailOptions, (err, data) => {
     if (err) {
-      console.log('Error ' + err);
+      console.log("Error " + err);
     } else {
-      console.log('Sent reset email succesfully');
+      console.log("Sent reset email succesfully");
     }
   });
-
 }
-
 
 module.exports = {
   hashPassword,
   generateAccessToken,
   sendEmail,
-}
+};
