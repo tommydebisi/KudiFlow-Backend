@@ -1,1 +1,3 @@
-## Backend aspect of the project
+## Backend Server
+
+Application server's folder
