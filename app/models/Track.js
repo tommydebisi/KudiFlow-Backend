@@ -32,10 +32,10 @@ const trackSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-  income: [{
+  cashFlow: [{
     type: {
       type: String,
-      default: 'Income'
+      default: 'None'
     },
     amount: {
       type: Number,
@@ -56,30 +56,6 @@ const trackSchema = new mongoose.Schema({
       default: Date.now
     },
   }],
-  expense: [{
-    type: {
-      type: String,
-      default: 'Expense'
-    },
-    amount: {
-      type: Number,
-      min: 0,
-      required: true,
-    },
-    description: {
-      type: String,
-      required: true
-    },
-    currentBalance: {
-      type: String,
-      default: 0,
-    },
-    createdAt: {
-      type: Date,
-      immutable: true,
-      default: Date.now
-    },
-  }]
 }, {
   versionKey: '1.0'
 });

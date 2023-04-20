@@ -1,65 +1,61 @@
-const { Types } = require('mongoose');
-const Track = require('../models/Track');
-const dbClient = require('../utils/db');
-
+const { Types } = require("mongoose");
+const Track = require("../models/Track");
+const dbClient = require("../utils/db");
 
 class TrackController {
-  // Controller for adding income
-  static async addIncome(req, res) {
-    const { amount, description } = req.body;
-    if (!amount) return res.status(400).json({ error: 'Missing Amount' });
-    if (!description) return res.status(400).json({ error: 'Missing Description' });
+  // Controller for adding CashFlow
+  static async addCashFlow(req, res) {
+    const { amount, description, type } = req.body;
+    if (!amount) return res.status(400).json({ error: "Missing Amount" });
+    if (!description)
+      return res.status(400).json({ error: "Missing Description" });
+    if (!type) return res.status(400).json({ error: "Missing Type" });
 
     // get the current track by user id
-    const track = await dbClient.getSchemaOne(Track, { userId: new Types.ObjectId(req.userId) });
-    const incomeCB = track.currentBalance + amount;
-    track.income.push({ amount, description, currentBalance: incomeCB });
+    const track = await dbClient.getSchemaOne(Track, {
+      userId: new Types.ObjectId(req.userId),
+    });
 
-    // add income to total income
-    track.totalIncome += amount;
-    track.currentBalance = track.totalIncome - track.totalExpenses;
+    // add to cashflow based on type
+    let cFlow;
+    if (type === "Expense") {
+      cFlow = track.currentBalance - amount;
+      track.totalExpenses += amount;
+    } else {
+      cFlow = track.currentBalance + amount;
+      track.totalExpenses += amount;
+    }
 
-    // date: { $dateToString: { format: "%Y-%m-%d", date: "$$lastIncome.createdAt" },
-    // time: { $dateToString: { format: "%H:%M:%S", date: "$$lastIncome.createdAt" }
+    track.cashFlow.push({
+      type,
+      amount,
+      description,
+      currentBalance: cFlow,
+    });
 
-    // save track
-    track.save();
-
-    return res.status(201).json({ message: 'success' });
-  }
-
-  // Controller for adding Expenses
-  static async addExpense(req, res) {
-    const { amount, description } = req.body;
-    if (!amount) return res.status(400).json({ error: 'Missing Amount' });
-    if (!description) return res.status(400).json({ error: 'Missing Description' });
-
-    // get the current track by user id
-    const track = await dbClient.getSchemaOne(Track, { userId: new Types.ObjectId(req.userId) });
-    const expensesCB = track.currentBalance - amount;
-    track.expense.push({ amount, description, currentBalance: expensesCB });
-
-    // add expenses to total income
-    track.totalExpenses += amount;
+    // get the current balance
     track.currentBalance = track.totalIncome - track.totalExpenses;
     track.save();
 
-    return res.status(201).json({ message: 'success' });
+    return res.status(201).json({ message: "success" });
   }
 
   // controller for adding new current balance
   static async addCurrentBal(req, res) {
     const { currentBalance } = req.body;
-    if (!currentBalance) return res.status(400).json({ error: 'Missing CurrentBalance' });
+    if (!currentBalance)
+      return res.status(400).json({ error: "Missing CurrentBalance" });
 
     // get the current track by user id
-    const track = await dbClient.getSchemaOne(Track, { userId: new Types.ObjectId(req.userId) });
+    const track = await dbClient.getSchemaOne(Track, {
+      userId: new Types.ObjectId(req.userId),
+    });
 
     track.currentBalance = currentBalance;
     track.totalIncome = currentBalance;
     track.save();
 
-    return res.status(201).json({ message: 'success' });
+    return res.status(201).json({ message: "success" });
   }
 
   // Controller for getting paginated list of income and expenses
@@ -74,17 +70,22 @@ class TrackController {
     page = Number(page);
 
     // get the current track by user id
-    const track = await dbClient.getSchemaOne(Track, { userId: new Types.ObjectId(req.userId) });
+    const track = await dbClient.getSchemaOne(Track, {
+      userId: new Types.ObjectId(req.userId),
+    });
 
     try {
       // get income and expense list
-      const incomeList = await dbClient.getIncomeList(Track, track._id, page, limit);
-      const expenseList = await dbClient.getExpenseList(Track, track._id, page, limit);
+      const flowList = await dbClient.getFlowList(
+        Track,
+        track._id,
+        page,
+        limit
+      );
 
       return res.status(200).json({
         currentBalance: track.currentBalance,
-        incomes: incomeList,
-        expenses: expenseList,
+        flowList,
       });
     } catch (e) {
       return res.status(400).json({ error: e.message });
