@@ -27,6 +27,3 @@ module.exports = {
   loginUserSchema,
   createUserSchema
 }
-  
-  
-  
