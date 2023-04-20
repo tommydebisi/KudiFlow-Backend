@@ -22,7 +22,11 @@ class AuthController {
     if (!password) return res.status(400).json({ error: "Missing password" });
 
     // validate password meets criteria
-    await createUserSchema.validateAsync({ email, password });
+    try {
+      await createUserSchema.validateAsync({ email, password });
+    } catch (error) {
+      return res.status(400).json({ error: error.message });
+    }
 
     // Check if user already exists
     const existingUser = await dbClient.getSchemaOne(User, { email });
