@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 class DBClient {
   constructor() {
     this._username = process.env.DB_USERNAME;
@@ -22,58 +22,44 @@ class DBClient {
   }
 
   /**
-   * Paginated list of incomes
+   * Paginated list of income an expenses
    * @param {mongoose.Schema} schema - db schema to query
    * @param {mongoose.Types.ObjectId} id - id of schema
    * @param {number} page - page to display
    * @param {number} limit - number of documents to display
    * @returns a list of incomes
    */
-  async getIncomeList(schema, id, page = 0, limit = 5) {
-    return schema.aggregate([
+  async getFlowList(schema, id, page = 0, limit = 5) {
+    const pipeline = [
       { $match: { _id: id } },
-      { $unwind: '$income' },
-      { $sort: { 'income.createdAt' : -1 } },
+      { $unwind: "$cashFlow" },
+      { $sort: { "cashFlow.createdAt": -1 } },
       { $skip: page * limit },
       { $limit: limit },
-      { $project: {
-        _id: 0,
-        income: {
-          type: '$income.type',
-          amount: '$income.amount',
-          description: '$income.description',
-          currentBalance: '$income.currentBalance',
-          createdAt: '$income.createdAt',
-        }
-      } },
-    ]);
-  }
-
-  /**
-   * Paginated list of expenses
-   * @param {mongoose.Schema} schema - db schema to query
-   * @param {mongoose.Types.ObjectId} id - id of schema
-   * @param {number} page - page to display
-   * @param {number} limit - number of documents to display
-   * @returns a list of expenses
-   */
-  async getExpenseList(schema, id, page = 0, limit = 5) {
-    return schema.aggregate([
-      { $match: { _id: id } },
-      { $unwind: '$expense' },
-      { $sort: { 'expense.createdAt' : -1 } },
-      { $skip: page * limit },
-      { $limit: limit },
-      { $project: {
-        _id: 0,
-        expense: {
-          amount: '$expense.amount',
-          description: '$expense.description',
-          currentBalance: '$expense.currentBalance',
-          createdAt: '$expense.createdAt',
-        }
-      } },
-    ]);
+      {
+        $project: {
+          _id: 0,
+          cashFlow: {
+            type: "$cashFlow.type",
+            amount: "$cashFlow.amount",
+            description: "$cashFlow.description",
+            currentBalance: "$cashFlow.currentBalance",
+            createdAt: "$cashFlow.createdAt",
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$cashFlow.createdAt" },
+            month: { $month: "$cashFlow.createdAt" },
+            day: { $dayOfMonth: "$cashFlow.createdAt" },
+          },
+          data: { $push: "$$ROOT" },
+        },
+      },
+    ];
+    return schema.aggregate(pipeline);
   }
 }
 const dbClient = new DBClient();
