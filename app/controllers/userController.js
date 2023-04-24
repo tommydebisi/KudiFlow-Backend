@@ -1,8 +1,8 @@
 const { Types } = require("mongoose");
 const { User } = require("../models/User");
 const dbClient = require("../utils/db");
-const { hashPassword } = require('../utils/helper');
-const { createUserSchema } = require('../validators/Validate');
+const { hashPassword } = require("../utils/helper");
+const { createUserSchema } = require("../validators/Validate");
 
 class UserController {
   static async userPassReset(req, res) {
