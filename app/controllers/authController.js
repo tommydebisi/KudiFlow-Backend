@@ -1,7 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { compare } = require("bcrypt");
 const { Types } = require("mongoose");
-const { randomBytes } = require("crypto");
 const dbClient = require("../utils/db");
 const redisClient = require("../utils/redis");
 const { User } = require("../models/User");
@@ -11,27 +10,27 @@ const {
   generateAccessToken,
   sendEmail,
 } = require("../utils/helper");
-const { createUserSchema, loginUserSchema } = require("../validators/Validate");
+const { createUserSchema } = require("../validators/Validate");
 
 class AuthController {
   static async signUp(req, res) {
     const { username, email, password } = req.body;
 
-    if (!username) return res.status(400).json({ error: "Missing username" });
-    if (!email) return res.status(400).json({ error: "Missing email" });
-    if (!password) return res.status(400).json({ error: "Missing password" });
+    if (!username) return res.status(400).json({ message: "Missing username" });
+    if (!email) return res.status(400).json({ message: "Missing email" });
+    if (!password) return res.status(400).json({ message: "Missing password" });
 
     // validate password meets criteria
     try {
       await createUserSchema.validateAsync({ email, password });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ message: error.message });
     }
 
     // Check if user already exists
     const existingUser = await dbClient.getSchemaOne(User, { email });
     if (existingUser)
-      return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ message: "User already exists" });
 
     const hashed_password = await hashPassword(password);
     try {
@@ -42,7 +41,7 @@ class AuthController {
 
       return res.status(201).json({ message: "success" });
     } catch (error) {
-      return res.status(400).json({ error: error.message });
+      return res.status(400).json({ message: error.message });
     }
   }
 
@@ -50,7 +49,7 @@ class AuthController {
     const { email, password } = req.body;
 
     // check if email and password is present
-    if (!email) return res.status(400).json({ error: "Missing email" });
+    if (!email) return res.status(400).json({ message: "Missing email" });
 
     // validate email using Joi schema
     /**const { error } = await loginUserSchema.validateAsync({ email });
@@ -58,11 +57,11 @@ class AuthController {
       return res.status(400).json({ error: 'Invalid email format' });
     }
 **/
-    if (!password) return res.status(400).json({ error: "Missing password" });
+    if (!password) return res.status(400).json({ message: "Missing password" });
 
     const user = await dbClient.getSchemaOne(User, { email });
     if (!user || !(await compare(password, user.hashed_password))) {
-      return res.status(400).json({ error: "Invalid email or password" });
+      return res.status(400).json({ message: "Invalid email or password" });
     }
     //signing token with user id
     const accessToken = generateAccessToken({ id: user._id.toString() });
@@ -97,14 +96,14 @@ class AuthController {
     // check if the user email is present in db
     const user = await dbClient.getSchemaOne(User, { email });
 
-    if (!user) return res.status(404).json({ error: "Not Found" });
+    if (!user) return res.status(404).json({ message: "Not Found" });
     const resetToken = require("crypto").randomBytes(30).toString("hex");
 
     try {
       // store reset password with expiry for 4min
       await redisClient.setex(`reset_${resetToken}`, user._id.toString(), 240);
     } catch (e) {
-      return res.status(400).json({ error: e.message });
+      return res.status(400).json({ message: e.message });
     }
 
     // send email with reset token
