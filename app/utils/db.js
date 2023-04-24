@@ -22,7 +22,7 @@ class DBClient {
   }
 
   /**
-   * Paginated list of income an expenses
+   * Paginated list of income and expenses
    * @param {mongoose.Schema} schema - db schema to query
    * @param {mongoose.Types.ObjectId} id - id of schema
    * @param {number} page - page to display
