@@ -79,31 +79,13 @@ class AuthController {
   }
 
   static async getNewToken(req, res) {
-    // get expired access token from request body
-    const { token } = req.body;
-
-    if (!token) return res.status(400).json({ error: "Missing Token" });
-    const refreshToken = await redisClient.get(`auth_${token}`);
-
-    // check if token is available
-    if (!refreshToken) return res.status(403).json({ error: "Forbidden" });
-
-    // verify refresh token
-    jwt.verify(
-      refreshToken,
-      process.env.API_SECRET_REFRESH,
-      async (err, field) => {
-        if (err)
-          return res.status(403).json({ error: "Unable to verify token" });
-
-        const accessToken = generateAccessToken({ id: field.id });
-        // remove previous accessToken
-        await redisClient.del(`auth_${token}`);
-        await redisClient.set(`auth_ ${accessToken}`, refreshToken);
-        return res.status(200).json({ accessToken });
-      }
-    );
+    const accessToken = generateAccessToken({ id: req.id });
+    // remove previous accessToken
+    await redisClient.del(`auth_${req.formerToken}`);
+    await redisClient.setex(`auth_${accessToken}`, req.refresh, 46200);
+    return res.status(200).json({ accessToken });
   }
+
   static async logout(req, res) {
     await redisClient.del(`auth_${req.token}`);
     return res.status(204).end();
