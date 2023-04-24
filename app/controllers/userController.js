@@ -16,7 +16,7 @@ class UserController {
 
     // validate password meets criteria
     try {
-      await createUserSchema.validateAsync({ userEmail, newPassword });
+      await createUserSchema.validateAsync({ email: userEmail, password: newPassword });
     } catch (error) {
       return res.status(400).json({ message: error.message });
     }
